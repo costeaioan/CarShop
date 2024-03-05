@@ -80,13 +80,13 @@ namespace CarShop.UI
             e.Column.Header = propertyDescriptor.DisplayName;
 
 
-            // after the last distinct property of each table we add the delete button
+            // before first property of each table we add the delete button
             if (carsDataGrid.Columns.Count == 0 && !carsDataGrid.Columns.Any(column => column.Header.Equals("Delete")))
             {
                 var deleteColumn = new DataGridTemplateColumn
                 {
                     Header = "Delete",
-                    CellTemplate = CreateDeleteCarButtonTemplate()
+                    CellTemplate = CreateDeleteButtonTemplate(DeleteCar_Click)
                 };
 
                 carsDataGrid.Columns.Add(deleteColumn);
@@ -96,7 +96,7 @@ namespace CarShop.UI
                 var deleteColumn = new DataGridTemplateColumn
                 {
                     Header = "Delete",
-                    CellTemplate = CreateDeleteClientButtonTemplate()
+                    CellTemplate = CreateDeleteButtonTemplate(DeleteClient_Click)
                 };
                 clientsDataGrid.Columns.Add(deleteColumn);
             }
@@ -106,30 +106,17 @@ namespace CarShop.UI
             }
         }
 
-        private DataTemplate CreateDeleteCarButtonTemplate()
+        private DataTemplate CreateDeleteButtonTemplate(Action<object, RoutedEventArgs> action)
         {
             var dataTemplate = new DataTemplate();
             var buttonFactory = new FrameworkElementFactory(typeof(Button));
             buttonFactory.SetValue(Button.ContentProperty, "X");
             buttonFactory.SetValue(Button.BackgroundProperty, Brushes.Red); // Use Brushes.Red here
-            buttonFactory.AddHandler(Button.ClickEvent, new RoutedEventHandler(DeleteCar_Click));
+            buttonFactory.AddHandler(Button.ClickEvent, new RoutedEventHandler(action));
             buttonFactory.SetBinding(Button.CommandParameterProperty, new Binding("Id")); // Binding to the ID property
             dataTemplate.VisualTree = buttonFactory;
             return dataTemplate;
         }
-
-        private DataTemplate CreateDeleteClientButtonTemplate()
-        {
-            var dataTemplate = new DataTemplate();
-            var buttonFactory = new FrameworkElementFactory(typeof(Button));
-            buttonFactory.SetValue(Button.ContentProperty, "X");
-            buttonFactory.SetValue(Button.BackgroundProperty, Brushes.Red);
-            buttonFactory.AddHandler(Button.ClickEvent, new RoutedEventHandler(DeleteClient_Click));
-            buttonFactory.SetBinding(Button.CommandParameterProperty, new Binding("Id")); // Binding to the ID property
-            dataTemplate.VisualTree = buttonFactory;
-            return dataTemplate;
-        }
-
     }
 }
 
