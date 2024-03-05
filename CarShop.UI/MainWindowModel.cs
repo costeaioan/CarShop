@@ -38,5 +38,24 @@ namespace CarShop.UI
             _carRepository.SaveChanges();
             _clientRepository.SaveChanges();
         }
+
+        public void DeleteCar(int carId)
+        {
+            _carRepository.Delete(carId);
+        }
+
+        public void DeleteClient(int clientId) {
+            _clientRepository.Delete(clientId);
+        }
+
+        public IEnumerable<Car> GetCars()
+        {
+            return _carRepository.GetAll();
+        }
+
+        public IEnumerable<Client> GetClients()
+        {
+            return _clientRepository.GetAll();
+        }
     }
 }
