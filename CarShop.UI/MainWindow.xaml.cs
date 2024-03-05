@@ -1,5 +1,4 @@
-﻿
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -13,6 +12,11 @@ namespace CarShop.UI
         {
             "Client",
             "Cars"
+        };
+
+        private List<string> _readonlyColumns = new List<string>()
+        {
+            "Id"
         };
         private readonly MainWindowModel _viewModel;
 
@@ -100,10 +104,39 @@ namespace CarShop.UI
                 };
                 clientsDataGrid.Columns.Add(deleteColumn);
             }
+            if(e.Column.Header.Equals("ClientId")) {
+                e.Column = CreateClientIdColumn();
+            }
             if (_excludedColumns.Contains(propertyDescriptor.DisplayName))
             {
                 e.Cancel = true;
             }
+
+            if(_readonlyColumns.Contains(propertyDescriptor.DisplayName))
+            {
+                e.Column.IsReadOnly = true;
+            }
+        }
+
+        private DataGridTemplateColumn CreateClientIdColumn()
+        {
+            DataGridTemplateColumn clientColumn = new DataGridTemplateColumn();
+            clientColumn.Header = "Client ID";
+
+            FrameworkElementFactory comboBoxFactory = new FrameworkElementFactory(typeof(ComboBox));
+            comboBoxFactory.SetValue(ComboBox.ItemsSourceProperty, _viewModel.Clients);
+            comboBoxFactory.SetValue(ComboBox.DisplayMemberPathProperty, "Id");
+            comboBoxFactory.SetValue(ComboBox.SelectedValuePathProperty, "Id");
+
+            Binding selectedValueBinding = new Binding("ClientId");
+            selectedValueBinding.Mode = BindingMode.TwoWay;
+            comboBoxFactory.SetBinding(ComboBox.SelectedValueProperty, selectedValueBinding);
+
+            DataTemplate cellTemplate = new DataTemplate();
+            cellTemplate.VisualTree = comboBoxFactory;
+            clientColumn.CellTemplate = cellTemplate;
+
+            return clientColumn;
         }
 
         private DataTemplate CreateDeleteButtonTemplate(Action<object, RoutedEventArgs> action)
@@ -111,9 +144,9 @@ namespace CarShop.UI
             var dataTemplate = new DataTemplate();
             var buttonFactory = new FrameworkElementFactory(typeof(Button));
             buttonFactory.SetValue(Button.ContentProperty, "X");
-            buttonFactory.SetValue(Button.BackgroundProperty, Brushes.Red); // Use Brushes.Red here
+            buttonFactory.SetValue(Button.BackgroundProperty, Brushes.Red); 
             buttonFactory.AddHandler(Button.ClickEvent, new RoutedEventHandler(action));
-            buttonFactory.SetBinding(Button.CommandParameterProperty, new Binding("Id")); // Binding to the ID property
+            buttonFactory.SetBinding(Button.CommandParameterProperty, new Binding("Id"));
             dataTemplate.VisualTree = buttonFactory;
             return dataTemplate;
         }
